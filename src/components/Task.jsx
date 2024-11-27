@@ -1,7 +1,10 @@
+import { useContext } from 'react';
+import TaskContext from '../store/TaskContext';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-const Task = ({ id, task, quadrant, onCheckChange }) => {
+const Task = ({ id, task }) => {
+    const { updateTask, deleteTask } = useContext(TaskContext);
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({id});
 
     const style = {
@@ -10,6 +13,14 @@ const Task = ({ id, task, quadrant, onCheckChange }) => {
         opacity: isDragging && id ? 0.3 : 1,
         touchAction: "none",
         cursor: isDragging ? "grabbing" : "grab",
+    };
+
+    const handleCheckChange = () => {
+        updateTask(id, { ...task, checked: !task.checked });
+    };
+
+    const handleDelete = () => {
+        deleteTask(id);
     };
 
     return (
@@ -27,7 +38,7 @@ const Task = ({ id, task, quadrant, onCheckChange }) => {
                     type="checkbox"
                     style={{width: "25px", height: "25px", cursor: "pointer", alignSelf: "center", marginTop: "0"}} 
                     checked={task.checked}
-                    onChange={() => onCheckChange(task.id)}
+                    onChange={handleCheckChange}
                 />
                 <label 
                     className="form-check-label" 
