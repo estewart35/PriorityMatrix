@@ -8,6 +8,7 @@ const Task = ({ id, task, onUpdateTask, onDeleteTask }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({id});
     const [isUpdateTaskModalOpen, setIsUpdateTaskModalOpen] = useState(false);
     const [isDeleteConfirmationModalOpen, setIsDeleteConfirmationModalOpen] = useState(false);
+    const [hovered, setHovered] = useState(false);
 
     const style = {
         transition,
@@ -27,6 +28,16 @@ const Task = ({ id, task, onUpdateTask, onDeleteTask }) => {
 
     const handleDeleteTask = () => {
         onDeleteTask(id);
+    };
+
+    const formatDeadline = (deadline) => {
+        if (!deadline) return;
+        const date = new Date(deadline);
+        return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+        });
     };
 
     return (
@@ -50,19 +61,39 @@ const Task = ({ id, task, onUpdateTask, onDeleteTask }) => {
                         checked={task.checked}
                         onChange={handleCheckChange}
                     />
-                    <label 
-                        className="form-check-label" 
-                        style={{
-                            textDecoration: task.checked ? "line-through" : "none",
-                            color: task.checked ? "gray" : "inherit",
-                        }}>
-                        {task.title}
-                    </label>
+                    <div className="d-flex flex-column" 
+                            onClick={() => setIsUpdateTaskModalOpen(true)}
+                            onMouseEnter={() => setHovered(true)}
+                            onMouseLeave={() => setHovered(false)}
+                            title="View/Edit Task">
+                        <label 
+                            
+                            className="form-check-label" 
+                            style={{
+                                textDecoration: hovered ? "underline" : task.checked ? "line-through" : "none",
+                                color: task.checked ? "gray" : "inherit",
+                                cursor: "pointer",
+                            }}
+                        >
+                            {task.title}
+                        </label>
+                        <label 
+                            className="form-check-label"
+                            style={{
+                                textDecoration: hovered ? "underline" : task.checked ? "line-through" : "none",
+                                color: "gray",
+                                cursor: "pointer",
+                                fontSize: "9pt",
+                            }}
+                        >
+                            {formatDeadline(task.deadline)}
+                        </label>
+                    </div>
                 </div>
-                <div className="d-flex">
-                    <button className="btn btn-sm btn-light me-1" onClick={() => setIsUpdateTaskModalOpen(true)} title="Edit Task"><i className="bi bi-pencil-fill text-dark"></i></button>
-                    <button className="btn btn-sm btn-light" onClick={() => setIsDeleteConfirmationModalOpen(true)} title="Delete Task"><i className="bi bi-trash-fill text-dark"></i></button>
-                </div>
+                {/* <div className="d-flex align-items-center"> */}
+                    {/* <button className="btn btn-sm btn-light me-1" onClick={() => setIsUpdateTaskModalOpen(true)} title="Edit Task"><i className="bi bi-pencil-fill text-dark"></i></button> */}
+                    <button className="btn btn-sm btn-light ms-2" onClick={() => setIsDeleteConfirmationModalOpen(true)} title="Delete Task"><i className="bi bi-trash-fill text-dark"></i></button>
+                {/* </div> */}
             </div>
         </>
     );

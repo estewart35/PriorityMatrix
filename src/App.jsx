@@ -18,7 +18,10 @@ function App() {
           <PriorityMatrix />
         ) : (
           <>
-            <p className="text-warning text-center mb-4"><i className="bi bi-exclamation-triangle me-2"></i>You are currently not signed in, your tasks will only be saved locally on this device.</p>
+            <div className="alert alert-dismissible alert-warning d-flex align-items-center">
+              <button type="button" className="btn-close" data-bs-dismiss="alert"></button>
+              <p className="mb-0"><span className="fw-semibold me-2"><i className="bi bi-exclamation-triangle me-2"></i>Warning!</span>You are currently not signed in, your tasks will only be saved locally on this device.</p>
+            </div>
             <PriorityMatrix />
           </>
         )}
