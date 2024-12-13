@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import useInput from "../hooks/useInput";
 
-const TaskForm = ({ onAddTask }) => {
+const TaskForm = ({ isUpdate, onAddTask, onUpdateTask, currentTask }) => {
     const {
         value: enteredTitle,
         isValid: enteredTitleIsValid,
@@ -8,18 +9,31 @@ const TaskForm = ({ onAddTask }) => {
         valueChangeHandler: titleChangedHandler,
         inputBlurHandler: titleBlurHandler,
         reset: resetTitleInput,
+        setValue: setTitleValue,
     } = useInput((value) => value.trim() !== "");
+
+    // Pre-fill the title field when editing
+    useEffect(() => {
+        if (isUpdate && currentTask) {
+            setTitleValue(currentTask.title);
+        }
+    }, []);
 
     const submitHandler = (event) => {
         event.preventDefault();
 
-        const newTask = {
-            id: Date.now(),
-            title: enteredTitle,
-            checked: false,
-        };
-        
-        onAddTask(newTask);
+        if (isUpdate) {
+            // Update task logic
+            onUpdateTask({ ...currentTask, title: enteredTitle });
+        } else {
+            // Add new task logic
+            const newTask = {
+                id: Date.now(),
+                title: enteredTitle,
+                checked: false,
+            };
+            onAddTask(newTask);
+        }
 
         resetTitleInput();
     }
@@ -45,7 +59,12 @@ const TaskForm = ({ onAddTask }) => {
                     <p className="invalid-feedback">Title must not be empty!</p>
                 )}
             </div>
-            <button type="submit" className="btn btn-primary" disabled={!formIsValid}><i className="bi bi-plus-lg me-2"></i>Add New Task</button>
+            {isUpdate ? (
+                <button type="submit" className="btn btn-primary float-end" disabled={!formIsValid}><i className="bi bi-check-lg me-2"></i>Update Task</button>
+            
+            ) : (
+                <button type="submit" className="btn btn-primary float-end" disabled={!formIsValid}><i className="bi bi-plus-lg me-2"></i>Add New Task</button>
+            )}
         </form>
     );
 }

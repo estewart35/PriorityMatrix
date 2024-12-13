@@ -1,4 +1,4 @@
-import { createContext, useReducer, useEffect } from "react";
+import { createContext, useReducer, useEffect, useRef } from "react";
 import { fetchTasks, saveTasks } from "../utils/db";
 
 const TaskContext = createContext();
@@ -8,6 +8,7 @@ const defaultTaskState = {
   loading: false,
   error: "",
   success: "",
+  warning: "",
 };
 
 const taskReducer = (state, action) => {
@@ -56,6 +57,10 @@ const taskReducer = (state, action) => {
       return { ...state, error: action.error };
     case "SET_SUCCESS":
       return { ...state, success: action.success };
+      case "SET_WARNING":
+      return { ...state, warning: action.warning };
+    case "RESET_MESSAGES":
+      return { ...state, success: "", error: "", warning: "" }; 
     default:
       return state;
   }
@@ -64,23 +69,50 @@ const taskReducer = (state, action) => {
 
 export const TaskProvider = ({ children, user }) => {
   const [taskState, dispatch] = useReducer(taskReducer, defaultTaskState);
+  const tasksLoaded = useRef(false);
 
   // Load tasks from the database when user changes
   useEffect(() => {
     const loadTasks = async () => {
-      if (!user) return;
-      dispatch({ type: "SET_LOADING", loading: true });
-      try {
-        const loadedTasks = await fetchTasks(user.uid); // Fetch from DB
-        dispatch({ type: "SET_TASKS", tasks: loadedTasks });
-      } catch (error) {
-        dispatch({ type: "SET_ERROR", error: error.message });
-      } finally {
-        dispatch({ type: "SET_LOADING", loading: false });
+      if (user) {
+        // Load tasks from the database
+        dispatch({ type: "SET_LOADING", loading: true });
+        try {
+          let loadedTasks = await fetchTasks(user.uid); // Fetch from DB
+          // If there are no tasks in the DB, load tasks from localStorage
+          if (JSON.stringify(loadedTasks) === JSON.stringify({ Q1: [], Q2: [], Q3: [], Q4: [] })) {
+            // Check if there are tasks in localStorage
+            const savedTasks = JSON.parse(localStorage.getItem("tasks"));
+            if (savedTasks !== JSON.stringify({ Q1: [], Q2: [], Q3: [], Q4: [] })) {
+              await saveTasks(user.uid, savedTasks); // Save tasks to the DB
+              loadedTasks = savedTasks; // Use the local tasks
+              dispatch({ type: "SET_SUCCESS", success: "Tasks loaded from localStorage are now saved to the database!" });
+            } 
+          } else {
+            dispatch({ type: "SET_SUCCESS", success: "Tasks are currently being saved and loaded from the database!" });
+          }
+          dispatch({ type: "SET_TASKS", tasks: loadedTasks });
+        } catch (error) {
+          dispatch({ type: "SET_ERROR", error: error.message });
+        } finally {
+          dispatch({ type: "SET_LOADING", loading: false });
+        }
+      } else {
+        if (tasksLoaded.current) return;
+        tasksLoaded.current = true;
+        // Load tasks from localStorage
+        const savedTasks = JSON.parse(localStorage.getItem("tasks")) || { Q1: [], Q2: [], Q3: [], Q4: [], };
+        dispatch({ type: "SET_TASKS", tasks: savedTasks });
+        dispatch({ type: "SET_WARNING", warning: "Tasks are currently being saved and loaded from local storage." });
       }
     };
     loadTasks();
   }, [user]);
+
+  // Save tasks to localStorage
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(taskState.tasks));
+  }, [taskState.tasks]);
 
   // Add a task
   const addTask = async (quadrant, task) => {
@@ -90,8 +122,28 @@ export const TaskProvider = ({ children, user }) => {
       updatedTasks[quadrant] = [...updatedTasks[quadrant], task];
       await saveTasks(user.uid, updatedTasks);
     } catch (error) {
-      dispatch({ type: "SET_ERROR", error: "Failed to save task" });
+      if (user) {
+        dispatch({ type: "SET_ERROR", error: "Failed to save task" });
+      }
     }
+  };
+
+  // Update a task
+  const updateTask = async (quadrant, taskId, updatedTask) => {
+      const updatedTasks = { ...taskState.tasks };
+      updatedTasks[quadrant] = updatedTasks[quadrant].map((task) =>
+        task.id === taskId ? { ...task, ...updatedTask } : task
+      );
+
+      dispatch({ type: "SET_TASKS", tasks: updatedTasks });
+
+      try {
+        await saveTasks(user.uid, updatedTasks); // Save changes to the database
+      } catch (error) {
+        if (user) {
+          dispatch({ type: "SET_ERROR", error: "Failed to update task" });
+        }
+      }
   };
 
   // Remove a task
@@ -102,7 +154,9 @@ export const TaskProvider = ({ children, user }) => {
       updatedTasks[quadrant] = updatedTasks[quadrant].filter((task) => task.id !== taskId);
       await saveTasks(user.uid, updatedTasks);
     } catch (error) {
-      dispatch({ type: "SET_ERROR", error: "Failed to remove task" });
+      if (user) {
+        dispatch({ type: "SET_ERROR", error: "Failed to remove task" });
+      }
     }
   };
 
@@ -112,7 +166,9 @@ export const TaskProvider = ({ children, user }) => {
     try {
       await saveTasks(user.uid, { ...taskState.tasks, [quadrant]: newOrder }); // Save to DB
     } catch (error) {
-      dispatch({ type: "SET_ERROR", error: "Failed to reorder tasks" });
+      if (user) {
+        dispatch({ type: "SET_ERROR", error: "Failed to reorder tasks" });
+      }
     }
   };
 
@@ -137,9 +193,15 @@ export const TaskProvider = ({ children, user }) => {
 
         await saveTasks(user.uid, updatedTasks);  // Save the updated tasks
       } catch (error) {
-        dispatch({ type: "SET_ERROR", error: "Failed to move task" });
+        if (user) {
+          dispatch({ type: "SET_ERROR", error: "Failed to move task" });
+        }
       }
     }
+  };
+
+  const clearMessages = () => {
+      dispatch({ type: "RESET_MESSAGES" });
   };
 
 
@@ -148,10 +210,13 @@ export const TaskProvider = ({ children, user }) => {
     loading: taskState.loading,
     error: taskState.error,
     success: taskState.success,
+    warning: taskState.warning,
     addTask,
+    updateTask,
     removeTask,
     reorderTasks,
     moveTask,
+    clearMessages,
   };
 
   return (

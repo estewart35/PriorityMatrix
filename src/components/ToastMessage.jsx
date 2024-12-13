@@ -1,6 +1,6 @@
 const ToastMessage = ({ message, color, closeToast }) => {
     return (
-        <div className="toast-container position-fixed top-1 end-0 px-3">
+        <div className="toast-container position-fixed bottom-0 end-0 p-3">
             <div id="liveToast" className={`show toast align-items-center ${color} border-0`} role="alert" aria-live="assertive" aria-atomic="true">
                 <div className="d-flex">
                     <div className="toast-body">
