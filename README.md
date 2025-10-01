@@ -18,14 +18,14 @@
 
 ## 🛠️ Tech Stack  
 - **Frontend:** React, Bootstrap, DnD Kit
+- **Backend:** Firebase
 - **Database:** Firebase 
-- **Hosting:** Netlify (frontend), Firebase (database)  
+- **Hosting:** Netlify (frontend), Firebase (backend/database)  
 
 ---
 
 ## 📸 Screenshots  
-![Screenshot 1](link-to-screenshot.png)  
-![Screenshot 2](link-to-screenshot.png)  
+![Screenshot 1](https://ethanstewart.dev/mockups/prioritymatrix_mockup_dark.svg) 
 
 ---
 
