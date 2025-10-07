@@ -33,8 +33,8 @@
 
 Clone the repo:  
 ```bash
-git clone https://github.com/yourusername/project-name.git
-cd project-name
+git clone https://github.com/estewart35/PriorityMatrix.git
+cd PriorityMatrix
 ```
 
 Install dependencies and run locally:
@@ -42,3 +42,16 @@ Install dependencies and run locally:
 npm install
 nmp run dev
 ```
+
+Create a `.env` file in the project root and add the required environment variables:
+```bash
+# .env
+VITE_FIREBASE_API_KEY=your_firebase_api_key_here
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+VITE_FIREBASE_DATABASE_URL=https://your_project_id.firebaseio.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id_here
+VITE_FIREBASE_APP_ID=your_app_id_here
+```
+*(Refer to `.env.example` if included in the repo for variable names.)*
