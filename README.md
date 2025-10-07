@@ -40,7 +40,7 @@ cd PriorityMatrix
 Install dependencies and run locally:
 ```bash
 npm install
-nmp run dev
+npm run dev
 ```
 
 Create a `.env` file in the project root and add the required environment variables:
