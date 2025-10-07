@@ -37,12 +37,6 @@ git clone https://github.com/estewart35/PriorityMatrix.git
 cd PriorityMatrix
 ```
 
-Install dependencies and run locally:
-```bash
-npm install
-npm run dev
-```
-
 Create a `.env` file in the project root and add the required environment variables:
 ```bash
 # .env
@@ -54,4 +48,10 @@ VITE_FIREBASE_STORAGE_BUCKET=your_project_id.firebasestorage.app
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id_here
 VITE_FIREBASE_APP_ID=your_app_id_here
 ```
-*(Refer to `.env.example` if included in the repo for variable names.)*
+*(Refer to `.env.example` in the repo for variable names.)*
+
+Install dependencies and run locally:
+```bash
+npm install
+npm run dev
+```
