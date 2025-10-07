@@ -17,7 +17,7 @@
 ---
 
 ## 🛠️ Tech Stack  
-- **Frontend:** React, Bootstrap, DnD Kit
+- **Frontend:** React, JavaScript, Bootstrap, DnD Kit
 - **Backend:** Firebase
 - **Database:** Firebase 
 - **Hosting:** Netlify (frontend), Firebase (backend/database)  
