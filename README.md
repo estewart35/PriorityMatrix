@@ -10,9 +10,9 @@
 ---
 
 ## ✨ Features  
-- User authentication with Google SSO
-- Drag-and-drop task management 
-- Persistent task storage using Local Storage (no login required)
+- User authentication with Google SSO for secure, streamlined sign-in
+- Drag-and-drop task management for intuitive organization across priority quadrants
+- Persistent task storage using Local Storage for quick access without requiring login
 
 ---
 
